@@ -60,6 +60,7 @@ class AuthDatasourceImplSQLite extends AuthDatasource
 
     public function register(RegisterUserDto $dto)
     {
+        $this->uow->beginTransaction();
         try {
             $existing = $this->userRepo->findByEmail($dto->email);
             if ($existing) {

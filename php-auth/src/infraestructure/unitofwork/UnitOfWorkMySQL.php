@@ -5,7 +5,7 @@ namespace app\infraestructure\unitofwork;
 use app\data\mysql\MySQLDatabase;
 use app\data\repositorio\MySQLRepositoryWrapper;
 
-class UnitOfWorkMySQL
+class UnitOfWorkMySQL implements IUnitOfWork
 {
     private MySQLRepositoryWrapper $userRepository;
 
@@ -27,5 +27,9 @@ class UnitOfWorkMySQL
     public function rollback(): void
     {
         MySQLDatabase::$entityManager->clear();
+    }
+
+    public function beginTransaction(){
+        MySQLDatabase::$entityManager->beginTransaction();
     }
 }

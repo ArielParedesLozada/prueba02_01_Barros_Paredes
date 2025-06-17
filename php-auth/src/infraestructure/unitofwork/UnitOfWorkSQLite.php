@@ -5,7 +5,7 @@ namespace app\infraestructure\unitofwork;
 use app\data\repositorio\SQLiteRepositoryWrapper;
 use app\data\sqlite\SQLiteDatabase;
 
-class UnitOfWorkSQLite
+class UnitOfWorkSQLite implements IUnitOfWork
 {
     private SQLiteRepositoryWrapper $userRepository;
 
@@ -27,5 +27,8 @@ class UnitOfWorkSQLite
     public function rollback(): void
     {
         SQLiteDatabase::$entityManager->clear();
+    }
+    public function beginTransaction(){
+        SQLiteDatabase::$entityManager->beginTransaction();
     }
 }
