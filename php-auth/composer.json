@@ -1,0 +1,31 @@
+{
+    "name": "usuario/php-auth",
+    "authors": [
+        {
+            "name": "ArielParedesLozada",
+            "email": "152462807+ArielParedesLozada@users.noreply.github.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "app\\": "src/"
+        }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "symfony/password-hasher": "^7.2",
+        "slim/slim": "^4.14",
+        "doctrine/orm": "^3.3",
+        "firebase/php-jwt": "^6.11",
+        "doctrine/dbal": "^4.2",
+        "symfony/cache": "^7.2",
+        "nyholm/psr7": "^1.8",
+        "nyholm/psr7-server": "^1.1"
+    },
+    "scripts": {
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S localhost:3000 -t public public/index.php"
+        ]
+    }
+}
