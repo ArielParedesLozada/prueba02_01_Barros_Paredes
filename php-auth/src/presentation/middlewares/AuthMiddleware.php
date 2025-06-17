@@ -39,7 +39,6 @@ class AuthMiddleware implements MiddlewareInterface
             $database = GlobalDatabase::getInstance(null);
             $repo = RepoFactory::generateRepository($database->connection::class, User::class)->generateRepository();
             $user = $repo->findById($payload['id']);
-
             if (!$user) {
                 return $this->unauthorized('User not found.');
             }

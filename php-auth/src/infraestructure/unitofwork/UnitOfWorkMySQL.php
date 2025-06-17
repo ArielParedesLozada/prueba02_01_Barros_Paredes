@@ -22,14 +22,17 @@ class UnitOfWorkMySQL implements IUnitOfWork
     public function commit(): void
     {
         MySQLDatabase::$entityManager->flush();
+        MySQLDatabase::$entityManager->commit();
     }
 
     public function rollback(): void
     {
+        MySQLDatabase::$entityManager->rollback();
         MySQLDatabase::$entityManager->clear();
     }
 
-    public function beginTransaction(){
+    public function beginTransaction()
+    {
         MySQLDatabase::$entityManager->beginTransaction();
     }
 }
