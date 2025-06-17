@@ -11,20 +11,22 @@ use app\domain\dtos\auth\LoginUserDto;
 use app\domain\dtos\auth\RegisterUserDto;
 use app\domain\errors\CustomError;
 use app\infraestructure\mappers\UserMapper;
+use app\infraestructure\unitofwork\UnitOfWorkMySQL;
 
 class AuthDatasourceImplMySQL extends AuthDatasource
 {
     private static ?AuthDatasourceImplMySQL $instance = null;
 
     private MySQLRepositoryWrapper $userRepo;
+    private UnitOfWorkMySQL $uow;
 
     private function __construct(
         private $hashPassword = [BycryptAdapter::class, 'hash'],
         private $comparePassword = [BycryptAdapter::class, 'compare']
     ) {
-        // ✅ Inyectamos correctamente con el repositorio base y entidad User
         $baseRepository = new MySQLRepository();
         $this->userRepo = new MySQLRepositoryWrapper($baseRepository, User::class);
+        $this->uow = new UnitOfWorkMySQL($this->userRepo);
     }
 
     public static function getInstance(): self
@@ -47,7 +49,6 @@ class AuthDatasourceImplMySQL extends AuthDatasource
             if (!$isMatching) {
                 throw CustomError::badRequest("Invalid password");
             }
-
             return UserMapper::userEntityFromObject($user);
         } catch (\Throwable $th) {
             if ($th instanceof CustomError) throw $th;
@@ -69,10 +70,11 @@ class AuthDatasourceImplMySQL extends AuthDatasource
                 $dto->name ?? null
             );
 
-            $this->userRepo->save($user); 
-
+            $this->userRepo->save($user);
+            $this->uow->commit();
             return UserMapper::userEntityFromObject($user);
         } catch (\Throwable $th) {
+            $this->uow->rollback();
             if ($th instanceof CustomError) throw $th;
             throw CustomError::internalServer($th->getMessage());
         }

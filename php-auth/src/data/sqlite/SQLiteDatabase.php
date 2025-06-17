@@ -12,17 +12,21 @@ use Doctrine\ORM\ORMSetup;
 class SQLiteDatabase extends Database
 {
     public static EntityManager $entityManager;
-    public static function connect(array $options)
+    public string $database;
+
+    public function __construct(array $options) {
+        $this->database = $options['database'];
+    }
+    public function connect()
     {
         try {
-            $database = $options['database'];
             $config = ORMSetup::createAttributeMetadataConfiguration(
                 paths: [__DIR__.'/./models/'],
                 isDevMode: true,
             );
             $connection = DriverManager::getConnection([
                 'driver' => 'pdo_sqlite',
-                'path' => __DIR__."/../../../$database",
+                'path' => __DIR__."/../../../$this->database",
             ], $config);
             self::$entityManager = new EntityManager($connection, $config);
             return true;

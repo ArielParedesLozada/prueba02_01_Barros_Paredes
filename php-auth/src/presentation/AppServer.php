@@ -39,6 +39,7 @@ class AppServer
 
     private function run($app): void
     {
+        echo "Skibidi";
         $app->run(); // Slim maneja la ejecución automáticamente
     }
 }

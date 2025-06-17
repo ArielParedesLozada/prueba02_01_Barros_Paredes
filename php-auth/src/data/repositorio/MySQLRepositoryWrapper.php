@@ -2,6 +2,7 @@
 
 namespace app\data\repositorio;
 
+use app\data\mysql\MySQLDatabase;
 use app\data\mysql\repositories\MySQLRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -14,7 +15,7 @@ class MySQLRepositoryWrapper implements IRepository
 
     public function __construct(MySQLRepository $baseRepository, string $entity)
     {
-        $this->em = \app\data\mysql\MySQLDatabase::$entityManager; // o usa el entity manager que venga por inyección
+        $this->em = MySQLDatabase::$entityManager;
         $this->repository = $baseRepository->getRepository($entity);
     }
 
@@ -37,7 +38,6 @@ class MySQLRepositoryWrapper implements IRepository
     {
         try {
             $this->em->persist($entity);
-            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al guardar: " . $th->getMessage());
@@ -48,7 +48,6 @@ class MySQLRepositoryWrapper implements IRepository
     {
         try {
             $this->em->remove($entity);
-            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al eliminar: " . $th->getMessage());

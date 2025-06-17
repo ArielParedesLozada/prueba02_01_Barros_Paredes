@@ -12,25 +12,37 @@ use Doctrine\ORM\ORMSetup;
 class MySQLDatabase extends Database
 {
     public static EntityManager $entityManager;
-    public static function connect(array $options)
+    public string $database;
+    public string $user;
+    public string $password;
+    public string $port;
+    public string $host;
+    public string $charset;
+
+
+    public function __construct(array $options) {
+        $this->database = $options['database'];
+        $this->user = $options['user'];
+        $this->password = $options['password'];
+        $this->port = $options['port'];
+        $this->host = $options['host'] ?? 'localhost';
+        $this->charset = $options['charset'] ?? 'utf8mb4';
+    }
+    public function connect()
     {
         try {
-            $database = $options['database'];
-            $user = $options['user'];
-            $password = $options['password'];
-            $port = $options['port'];
             $config = ORMSetup::createAttributeMetadataConfiguration(
                 paths: [__DIR__ . '/./models/'],
                 isDevMode: true,
             );
             $connection = DriverManager::getConnection([
                 'driver' => 'pdo_mysql',
-                'host'     => $options['host'],
-                'port'     => $port,
-                'dbname'   => $database,
-                'user'     => $user,
-                'password' => $password,
-                'charset'  => $options['charset'] ?? 'utf8mb4',
+                'host'     => $this->host,
+                'port'     => $this->port,
+                'dbname'   => $this->database,
+                'user'     => $this->user,
+                'password' => $this->password,
+                'charset'  => $this->charset,
             ], $config);
             self::$entityManager = new EntityManager($connection, $config);
             return true;

@@ -3,6 +3,7 @@
 namespace app\data\repositorio;
 
 use app\data\sqlite\repositories\SQLiteRepository;
+use app\data\sqlite\SQLiteDatabase;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use app\domain\errors\CustomError;
@@ -15,7 +16,7 @@ class SQLiteRepositoryWrapper implements IRepository
     public function __construct(SQLiteRepository $baseRepository, string $entity)
     {
         $this->repository = $baseRepository->getRepository($entity);
-        $this->em = \app\data\sqlite\SQLiteDatabase::$entityManager;
+        $this->em = SQLiteDatabase::$entityManager;
     }
 
     public function findAll(): array
@@ -37,7 +38,6 @@ class SQLiteRepositoryWrapper implements IRepository
     {
         try {
             $this->em->persist($entity);
-            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al guardar: " . $th->getMessage());
@@ -48,7 +48,6 @@ class SQLiteRepositoryWrapper implements IRepository
     {
         try {
             $this->em->remove($entity);
-            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al eliminar: " . $th->getMessage());

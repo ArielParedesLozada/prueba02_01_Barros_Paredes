@@ -3,5 +3,5 @@ namespace app\data;
 
 abstract class Database
 {
-    public abstract static function connect(array $options);
+    public abstract function connect();
 }

@@ -11,12 +11,15 @@ use app\domain\dtos\auth\LoginUserDto;
 use app\domain\dtos\auth\RegisterUserDto;
 use app\domain\errors\CustomError;
 use app\infraestructure\mappers\UserMapper;
+use app\infraestructure\unitofwork\UnitOfWorkSQLite;
 
 class AuthDatasourceImplSQLite extends AuthDatasource
 {
     private static ?AuthDatasourceImplSQLite $instance = null;
 
     private SQLiteRepositoryWrapper $userRepo;
+    private UnitOfWorkSQLite $uow;
+
 
     private function __construct(
         private $hashPassword = [BycryptAdapter::class, 'hash'],
@@ -24,6 +27,7 @@ class AuthDatasourceImplSQLite extends AuthDatasource
     ) {
         $baseRepository = new SQLiteRepository();
         $this->userRepo = new SQLiteRepositoryWrapper($baseRepository, User::class);
+        $this->uow = new UnitOfWorkSQLite($this->userRepo);
     }
 
     public static function getInstance(): self
@@ -69,9 +73,10 @@ class AuthDatasourceImplSQLite extends AuthDatasource
             );
 
             $this->userRepo->save($user);
-
+            $this->uow->commit();
             return UserMapper::userEntityFromObject($user);
         } catch (\Throwable $th) {
+            $this->uow->rollback();
             if ($th instanceof CustomError) throw $th;
             throw CustomError::internalServer($th->getMessage());
         }

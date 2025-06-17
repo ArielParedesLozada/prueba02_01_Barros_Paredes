@@ -5,8 +5,9 @@ namespace app\presentation\middlewares;
 // require __DIR__ . '/../../../vendor/autoload.php';
 
 use app\config\JwtAdapter;
+use app\data\factories\RepoFactory;
 use app\data\sqlite\models\User;
-use app\data\sqlite\repositories\SQLiteRepository;
+use app\infraestructure\singleton\GlobalDatabase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -35,7 +36,9 @@ class AuthMiddleware implements MiddlewareInterface
                 return $this->unauthorized('Invalid token.');
             }
 
-            $user = (new SQLiteRepository())->getRepository(User::class)->find($payload['id']);
+            $database = GlobalDatabase::getInstance(null);
+            $repo = RepoFactory::generateRepository($database->connection::class, User::class)->generateRepository();
+            $user = $repo->findById($payload['id']);
 
             if (!$user) {
                 return $this->unauthorized('User not found.');

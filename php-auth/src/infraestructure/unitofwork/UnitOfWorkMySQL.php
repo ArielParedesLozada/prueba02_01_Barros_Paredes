@@ -1,21 +1,17 @@
 <?php
 
-namespace app\infrastructure\unitofwork;
+namespace app\infraestructure\unitofwork;
 
-use app\data\mysql\repositories\MySQLRepository;
 use app\data\mysql\MySQLDatabase;
-use app\data\mysql\models\User;
 use app\data\repositorio\MySQLRepositoryWrapper;
 
 class UnitOfWorkMySQL
 {
     private MySQLRepositoryWrapper $userRepository;
 
-    public function __construct()
+    public function __construct(MySQLRepositoryWrapper $repo)
     {
-        $repo = new MySQLRepository();
-
-        $this->userRepository = new MySQLRepositoryWrapper($repo, User::class);
+        $this->userRepository = $repo;
     }
 
     public function users(): MySQLRepositoryWrapper
