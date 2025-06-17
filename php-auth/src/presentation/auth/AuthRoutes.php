@@ -16,7 +16,7 @@ class AuthRoutes
 {
     public  static function routes(RouteCollectorProxy $group)
     {
-        $datasource = DatasourceFactory::generateDataSource(AuthDatasourceImplMySQL::class, User::class);
+        $datasource = DatasourceFactory::generateDataSource(AuthDatasourceImplMySQL::class, User::class)->generateDatabase();
         $authRepository = new AuthRepositoryImpl($datasource);
         $controller = new AuthController($authRepository);
 
