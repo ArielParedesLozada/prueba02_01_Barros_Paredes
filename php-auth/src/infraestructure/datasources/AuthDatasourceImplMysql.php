@@ -38,7 +38,7 @@ class AuthDatasourceImplMySQL extends AuthDatasource
     public function login(LoginUserDto $dto)
     {
         try {
-            $user = $this->userRepo->repository->findOneBy(['email' => $dto->email]);
+            $user = $this->userRepo->findByEmail($dto->email);
             if (!$user) {
                 throw CustomError::badRequest("User does not exist - email");
             }
@@ -58,7 +58,7 @@ class AuthDatasourceImplMySQL extends AuthDatasource
     public function register(RegisterUserDto $dto)
     {
         try {
-            $existing = $this->userRepo->repository->findOneBy(['email' => $dto->email]);
+            $existing = $this->userRepo->findByEmail($dto->email);
             if ($existing) {
                 throw CustomError::badRequest("User already exists");
             }

@@ -4,15 +4,18 @@ namespace app\data\repositorio;
 
 use app\data\sqlite\repositories\SQLiteRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use app\domain\errors\CustomError;
 
-class MySQLRepositoryWrapper implements IRepository
+class SQLiteRepositoryWrapper implements IRepository
 {
     private EntityRepository $repository;
+    private EntityManagerInterface $em;
 
     public function __construct(SQLiteRepository $baseRepository, string $entity)
     {
         $this->repository = $baseRepository->getRepository($entity);
+        $this->em = \app\data\sqlite\SQLiteDatabase::$entityManager;
     }
 
     public function findAll(): array
@@ -25,12 +28,16 @@ class MySQLRepositoryWrapper implements IRepository
         return $this->repository->find($id);
     }
 
+    public function findByEmail(string $email): ?object
+    {
+        return $this->repository->findOneBy(['email' => $email]);
+    }
+
     public function save(object $entity): bool
     {
         try {
-            $em = $this->repository->getEntityManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->em->persist($entity);
+            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al guardar: " . $th->getMessage());
@@ -40,9 +47,8 @@ class MySQLRepositoryWrapper implements IRepository
     public function delete(object $entity): bool
     {
         try {
-            $em = $this->repository->getEntityManager();
-            $em->remove($entity);
-            $em->flush();
+            $this->em->remove($entity);
+            $this->em->flush();
             return true;
         } catch (\Throwable $th) {
             throw CustomError::internalServer("Error al eliminar: " . $th->getMessage());
